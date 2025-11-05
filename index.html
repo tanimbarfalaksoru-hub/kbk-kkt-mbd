@@ -353,7 +353,7 @@
      <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-bold text-gray-800">Data Anggota</h2><button id="addMemberBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition duration-200"> ➕ Tambah </button>
      </div><!-- Search -->
-     <div class="bg-white rounded-xl card-shadow p-4 mb-4"><input type="text" id="searchInput" placeholder="Cari nama, paroki, atau wilayah..." class="form-input">
+     <div class="bg-white rounded-xl card-shadow p-4 mb-4"><input type="text" id="searchInput" placeholder="Cari nama, jabatan, atau paroki..." class="form-input">
      </div><!-- Members List -->
      <div id="membersList" class="space-y-3"><!-- Members will be populated here -->
      </div><!-- Loading State -->
@@ -445,7 +445,7 @@
       </div>
       <div class="form-group"><label class="form-label">Nama Lengkap *</label> <input type="text" id="namaLengkap" class="form-input" required>
       </div>
-      <div class="form-group"><label class="form-label">Jabatan Organisasi *</label> <select id="jabatanOrganisasi" class="form-input" required> <option value="">Pilih Jabatan</option> <option value="Ketua">Ketua</option> <option value="Wakil Ketua">Wakil Ketua</option> <option value="Sekretaris">Sekretaris</option> <option value="Bendahara">Bendahara</option> <option value="Koordinator Wilayah">Koordinator Wilayah</option> <option value="Anggota">Anggota</option> </select>
+      <div class="form-group"><label class="form-label">Jabatan Organisasi *</label> <input type="text" id="jabatanOrganisasi" class="form-input" required placeholder="Masukkan jabatan dalam organisasi">
       </div>
       <div class="form-group"><label class="form-label">Pekerjaan *</label> <input type="text" id="pekerjaan" class="form-input" required>
       </div>
@@ -457,8 +457,6 @@
       <div class="form-group"><label class="form-label">Paroki *</label> <input type="text" id="paroki" class="form-input" required>
       </div>
       <div class="form-group"><label class="form-label">Lingkungan *</label> <input type="text" id="lingkungan" class="form-input" required>
-      </div>
-      <div class="form-group"><label class="form-label">Wilayah *</label> <input type="text" id="wilayah" class="form-input" required>
       </div>
      </div><!-- Contact Info Section -->
      <div class="form-section">
@@ -472,11 +470,9 @@
      </div><!-- Status Section -->
      <div class="form-section">
       <div class="form-section-title">
-       📋 Status &amp; Tanggal
+       📋 Status Keaktifan
       </div>
       <div class="form-group"><label class="form-label">Status Keaktifan *</label> <select id="statusKeaktifan" class="form-input" required> <option value="">Pilih Status</option> <option value="Aktif">Aktif</option> <option value="Tidak Aktif">Tidak Aktif</option> </select>
-      </div>
-      <div class="form-group"><label class="form-label">Tanggal Bergabung *</label> <input type="date" id="tanggalBergabung" class="form-input" required>
       </div>
      </div><!-- Action Buttons -->
      <div class="form-section">
@@ -752,7 +748,6 @@
                             <div class="text-sm text-gray-600 space-y-1">
                                 <p>💼 ${member.pekerjaan}</p>
                                 <p>⛪ ${member.paroki} - ${member.lingkungan}</p>
-                                <p>🌍 ${member.wilayah}</p>
                                 <p>📞 ${member.no_hp}</p>
                             </div>
                             <div class="flex space-x-2 mt-3">
@@ -779,7 +774,6 @@
                     member.nama_lengkap.toLowerCase().includes(searchTerm) ||
                     member.jabatan_organisasi.toLowerCase().includes(searchTerm) ||
                     member.paroki.toLowerCase().includes(searchTerm) ||
-                    member.wilayah.toLowerCase().includes(searchTerm) ||
                     member.pekerjaan.toLowerCase().includes(searchTerm)
                 );
             }
@@ -827,11 +821,9 @@
             document.getElementById('pekerjaan').value = editingMember.pekerjaan || '';
             document.getElementById('paroki').value = editingMember.paroki;
             document.getElementById('lingkungan').value = editingMember.lingkungan;
-            document.getElementById('wilayah').value = editingMember.wilayah;
             document.getElementById('noHp').value = editingMember.no_hp;
             document.getElementById('email').value = editingMember.email;
             document.getElementById('statusKeaktifan').value = editingMember.status_keaktifan;
-            document.getElementById('tanggalBergabung').value = editingMember.tanggal_bergabung;
             
             // Set photo
             capturedPhoto = editingMember.photo || null;
@@ -953,11 +945,9 @@
                 photo: capturedPhoto || '',
                 paroki: document.getElementById('paroki').value,
                 lingkungan: document.getElementById('lingkungan').value,
-                wilayah: document.getElementById('wilayah').value,
                 no_hp: document.getElementById('noHp').value,
                 email: document.getElementById('email').value,
-                status_keaktifan: document.getElementById('statusKeaktifan').value,
-                tanggal_bergabung: document.getElementById('tanggalBergabung').value
+                status_keaktifan: document.getElementById('statusKeaktifan').value
             };
 
             try {
@@ -1117,5 +1107,5 @@
         // Initialize app when DOM is loaded
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'999b141c73bd582b',t:'MTc2MjMzMjM2NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'999b227273f414a6',t:'MTc2MjMzMjk1MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
