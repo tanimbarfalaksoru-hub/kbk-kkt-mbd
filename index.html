@@ -1,0 +1,1121 @@
+<!doctype html>
+<html lang="id" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kaum Bapak Katolik KKT-MBD</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+        body {
+            box-sizing: border-box;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #1e40af 100%);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .loading-spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #1e40af;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .nav-active {
+            color: #1d4ed8 !important;
+        }
+        
+        .nav-active svg {
+            fill: #1d4ed8 !important;
+        }
+        
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            z-index: 50;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        .main-content {
+            padding-bottom: 80px;
+        }
+        
+        .photo-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #e5e7eb;
+        }
+        
+        .photo-placeholder {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px dashed #d1d5db;
+            color: #6b7280;
+            font-size: 2rem;
+        }
+        
+        .form-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f3f4f6;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s;
+            background: #fafafa;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            width: 100%;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            width: 100%;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .member-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .camera-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .camera-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .camera-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .camera-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .capture-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .capture-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .camera-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+ </head>
+ <body class="h-full bg-gray-50"><!-- Login Screen -->
+  <div id="loginScreen" class="h-full gradient-bg flex items-center justify-center p-4">
+   <div class="bg-white rounded-2xl card-shadow p-8 w-full max-w-sm">
+    <div class="text-center mb-8"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhIeZ6qthY4_Zakt9dztJOs2oujjPYHlGcN-aiHQhkXETfCaD9wF8rPgmPhcRK5WT3DfBONugn5A7XDi4wcwMVUsoOPyR7BG5BsyY0S-OVPpHNSfj9r1tROE_XyKULjwrha0iutK-WZife2W0L0-4G630HGQjp_gaJPnqyMC6UBj6kKiHutsSrCkyC8NYwK/s320/Santo%20Yosep%20(4).png" alt="Logo Santo Yosep" class="w-20 h-20 mx-auto mb-4 rounded-full" onerror="this.src=''; this.alt='Logo gagal dimuat'; this.style.display='none';">
+     <h1 class="text-2xl font-bold text-gray-800 mb-2">Kaum Bapak Katolik</h1>
+     <p class="text-gray-600">KKT-MBD Mobile App</p>
+    </div>
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+     <div class="flex items-center">
+      <div class="text-blue-600 mr-2">
+       ℹ️
+      </div>
+      <div class="text-sm text-blue-800"><strong>Demo Mode:</strong> Klik "Masuk" untuk mengakses aplikasi
+      </div>
+     </div>
+    </div>
+    <form id="loginForm" class="space-y-4">
+     <div class="form-group"><label class="form-label">Email</label> <input type="email" class="form-input" placeholder="admin@kkt-mbd.org" value="admin@kkt-mbd.org">
+     </div>
+     <div class="form-group"><label class="form-label">Password</label> <input type="password" class="form-input" placeholder="••••••••" value="demo123">
+     </div><button type="submit" class="btn-primary"> Masuk </button>
+    </form>
+   </div>
+  </div><!-- Main App -->
+  <div id="mainApp" class="hidden h-full flex flex-col"><!-- Header -->
+   <header class="gradient-bg text-white p-4 shadow-lg">
+    <div class="flex items-center justify-between">
+     <div class="flex items-center"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhIeZ6qthY4_Zakt9dztJOs2oujjPYHlGcN-aiHQhkXETfCaD9wF8rPgmPhcRK5WT3DfBONugn5A7XDi4wcwMVUsoOPyR7BG5BsyY0S-OVPpHNSfj9r1tROE_XyKULjwrha0iutK-WZife2W0L0-4G630HGQjp_gaJPnqyMC6UBj6kKiHutsSrCkyC8NYwK/s320/Santo%20Yosep%20(4).png" alt="Logo Santo Yosep" class="w-8 h-8 mr-3 rounded-full" onerror="this.src=''; this.alt='Logo gagal dimuat'; this.style.display='none';">
+      <div>
+       <h1 id="appTitle" class="text-lg font-bold">Kaum Bapak Katolik KKT-MBD</h1>
+       <p class="text-blue-200 text-sm">Mobile App</p>
+      </div>
+     </div><button id="logoutBtn" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm transition duration-200"> Keluar </button>
+    </div>
+   </header><!-- Content Area -->
+   <main class="flex-1 overflow-y-auto main-content"><!-- Dashboard Page -->
+    <div id="dashboardPage" class="page-content p-4">
+     <div class="mb-6">
+      <h2 class="text-xl font-bold text-gray-800 mb-2">Dashboard</h2>
+      <p id="welcomeMessage" class="text-gray-600">Selamat datang di sistem manajemen data Kaum Bapak Katolik</p>
+     </div><!-- Stats Cards -->
+     <div class="grid grid-cols-2 gap-4 mb-6">
+      <div class="bg-white rounded-xl card-shadow p-4">
+       <div class="text-center">
+        <div class="text-3xl mb-2">
+         👥
+        </div>
+        <p class="text-gray-600 text-sm">Total Anggota</p>
+        <p id="totalMembers" class="text-2xl font-bold text-gray-800">0</p>
+       </div>
+      </div>
+      <div class="bg-white rounded-xl card-shadow p-4">
+       <div class="text-center">
+        <div class="text-3xl mb-2">
+         ✅
+        </div>
+        <p class="text-gray-600 text-sm">Anggota Aktif</p>
+        <p id="activeMembers" class="text-2xl font-bold text-gray-800">0</p>
+       </div>
+      </div>
+     </div><!-- Quick Actions -->
+     <div class="bg-white rounded-xl card-shadow p-4 mb-6">
+      <h3 class="font-semibold text-gray-800 mb-4">Aksi Cepat</h3>
+      <div class="grid grid-cols-2 gap-3"><button class="quick-action-btn bg-blue-50 hover:bg-blue-100 p-4 rounded-xl text-center transition duration-200" data-action="add-member">
+        <div class="text-3xl mb-2">
+         ➕
+        </div>
+        <div class="text-sm font-medium text-blue-700">
+         Tambah Anggota
+        </div></button> <button class="quick-action-btn bg-green-50 hover:bg-green-100 p-4 rounded-xl text-center transition duration-200" data-action="view-stats">
+        <div class="text-3xl mb-2">
+         📊
+        </div>
+        <div class="text-sm font-medium text-green-700">
+         Lihat Statistik
+        </div></button>
+      </div>
+     </div><!-- Recent Activity -->
+     <div class="bg-white rounded-xl card-shadow p-4">
+      <h3 class="font-semibold text-gray-800 mb-4">Aktivitas Terbaru</h3>
+      <div id="recentActivity" class="space-y-3">
+       <p class="text-gray-500 text-sm">Belum ada aktivitas</p>
+      </div>
+     </div>
+    </div><!-- Members Page -->
+    <div id="membersPage" class="page-content hidden p-4">
+     <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl font-bold text-gray-800">Data Anggota</h2><button id="addMemberBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition duration-200"> ➕ Tambah </button>
+     </div><!-- Search -->
+     <div class="bg-white rounded-xl card-shadow p-4 mb-4"><input type="text" id="searchInput" placeholder="Cari nama, paroki, atau wilayah..." class="form-input">
+     </div><!-- Members List -->
+     <div id="membersList" class="space-y-3"><!-- Members will be populated here -->
+     </div><!-- Loading State -->
+     <div id="membersLoading" class="text-center py-8">
+      <div class="loading-spinner mx-auto mb-2"></div>
+      <p class="text-gray-600">Memuat data anggota...</p>
+     </div>
+    </div><!-- Statistics Page -->
+    <div id="statisticsPage" class="page-content hidden p-4">
+     <h2 class="text-xl font-bold text-gray-800 mb-4">Statistik Anggota</h2>
+     <div class="space-y-6"><!-- Status Chart -->
+      <div class="bg-white rounded-xl card-shadow p-4">
+       <h3 class="font-semibold text-gray-800 mb-3">Status Keaktifan</h3>
+       <canvas id="statusChart" width="400" height="200"></canvas>
+      </div><!-- Paroki Chart -->
+      <div class="bg-white rounded-xl card-shadow p-4">
+       <h3 class="font-semibold text-gray-800 mb-3">Anggota per Paroki</h3>
+       <canvas id="parokiChart" width="400" height="300"></canvas>
+      </div>
+     </div>
+    </div><!-- Profile Page -->
+    <div id="profilePage" class="page-content hidden p-4">
+     <h2 class="text-xl font-bold text-gray-800 mb-4">Profil Organisasi</h2>
+     <div class="bg-white rounded-xl card-shadow p-6">
+      <div class="text-center mb-6"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhIeZ6qthY4_Zakt9dztJOs2oujjPYHlGcN-aiHQhkXETfCaD9wF8rPgmPhcRK5WT3DfBONugn5A7XDi4wcwMVUsoOPyR7BG5BsyY0S-OVPpHNSfj9r1tROE_XyKULjwrha0iutK-WZife2W0L0-4G630HGQjp_gaJPnqyMC6UBj6kKiHutsSrCkyC8NYwK/s320/Santo%20Yosep%20(4).png" alt="Logo Santo Yosep" class="w-24 h-24 mx-auto mb-4 rounded-full" onerror="this.src=''; this.alt='Logo gagal dimuat'; this.style.display='none';">
+       <h3 id="organizationName" class="text-xl font-bold text-gray-800 mb-2">Kaum Bapak Katolik Kevikepan KKT-MBD</h3>
+       <p class="text-gray-600">Mobile Management System</p>
+      </div>
+      <div class="space-y-4">
+       <div class="border-b border-gray-200 pb-3">
+        <h4 class="font-semibold text-gray-700">Tentang Aplikasi</h4>
+        <p class="text-gray-600 text-sm mt-1">Aplikasi manajemen data anggota Kaum Bapak Katolik yang digunakan untuk kemudahan pengelolaan data.</p>
+       </div>
+       <div class="border-b border-gray-200 pb-3">
+        <h4 class="font-semibold text-gray-700">Fitur Utama</h4>
+        <ul class="text-gray-600 text-sm mt-1 space-y-1">
+         <li>• Manajemen data anggota lengkap</li>
+         <li>• Capture photo langsung</li>
+         <li>• Interface mobile-friendly</li>
+         <li>• Sinkronisasi dengan Canva Sheet</li>
+        </ul>
+       </div>
+       <div>
+        <h4 class="font-semibold text-gray-700">Kontak</h4>
+        <p class="text-gray-600 text-sm mt-1">Email: admin@kkt-mbd.org</p>
+       </div>
+      </div>
+     </div>
+    </div>
+   </main><!-- Bottom Navigation -->
+   <nav class="mobile-nav">
+    <div class="flex justify-around py-2"><button class="nav-btn nav-active flex flex-col items-center py-2 px-3 text-gray-500 transition-colors" data-page="dashboard">
+      <svg class="w-6 h-6 mb-1" fill="currentColor" viewbox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+      </svg><span class="text-xs">Dashboard</span> </button> <button class="nav-btn flex flex-col items-center py-2 px-3 text-gray-500 transition-colors" data-page="members">
+      <svg class="w-6 h-6 mb-1" fill="currentColor" viewbox="0 0 20 20"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+      </svg><span class="text-xs">Anggota</span> </button> <button class="nav-btn flex flex-col items-center py-2 px-3 text-gray-500 transition-colors" data-page="statistics">
+      <svg class="w-6 h-6 mb-1" fill="currentColor" viewbox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+      </svg><span class="text-xs">Statistik</span> </button> <button class="nav-btn flex flex-col items-center py-2 px-3 text-gray-500 transition-colors" data-page="profile">
+      <svg class="w-6 h-6 mb-1" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+      </svg><span class="text-xs">Profil</span> </button>
+    </div>
+   </nav>
+  </div><!-- Add/Edit Member Modal -->
+  <div id="memberModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+   <div class="bg-gray-50 rounded-2xl w-full max-w-md max-h-[90%] overflow-y-auto">
+    <div class="sticky top-0 bg-white p-4 border-b border-gray-200 rounded-t-2xl">
+     <div class="flex items-center justify-between">
+      <h3 id="modalTitle" class="text-lg font-semibold text-gray-800">Tambah Anggota Baru</h3><button id="closeModalBtn" class="text-gray-500 hover:text-gray-700">
+       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+       </svg></button>
+     </div>
+    </div>
+    <form id="memberForm" class="p-4 space-y-4"><!-- Photo Section -->
+     <div class="form-section">
+      <div class="form-section-title">
+       📸 Foto Profil
+      </div>
+      <div class="text-center">
+       <div id="photoPreview" class="photo-placeholder mx-auto mb-4">
+        📷
+       </div><button type="button" id="capturePhotoBtn" class="btn-primary mb-2"> 📸 Ambil Foto </button> <button type="button" id="removePhotoBtn" class="btn-secondary hidden"> 🗑️ Hapus Foto </button>
+      </div>
+     </div><!-- Personal Info Section -->
+     <div class="form-section">
+      <div class="form-section-title">
+       👤 Informasi Pribadi
+      </div>
+      <div class="form-group"><label class="form-label">ID Anggota</label> <input type="text" id="idAnggota" class="form-input bg-gray-100" readonly placeholder="ID akan dibuat otomatis">
+      </div>
+      <div class="form-group"><label class="form-label">Nama Lengkap *</label> <input type="text" id="namaLengkap" class="form-input" required>
+      </div>
+      <div class="form-group"><label class="form-label">Jabatan Organisasi *</label> <select id="jabatanOrganisasi" class="form-input" required> <option value="">Pilih Jabatan</option> <option value="Ketua">Ketua</option> <option value="Wakil Ketua">Wakil Ketua</option> <option value="Sekretaris">Sekretaris</option> <option value="Bendahara">Bendahara</option> <option value="Koordinator Wilayah">Koordinator Wilayah</option> <option value="Anggota">Anggota</option> </select>
+      </div>
+      <div class="form-group"><label class="form-label">Pekerjaan *</label> <input type="text" id="pekerjaan" class="form-input" required>
+      </div>
+     </div><!-- Church Info Section -->
+     <div class="form-section">
+      <div class="form-section-title">
+       ⛪ Informasi Gereja
+      </div>
+      <div class="form-group"><label class="form-label">Paroki *</label> <input type="text" id="paroki" class="form-input" required>
+      </div>
+      <div class="form-group"><label class="form-label">Lingkungan *</label> <input type="text" id="lingkungan" class="form-input" required>
+      </div>
+      <div class="form-group"><label class="form-label">Wilayah *</label> <input type="text" id="wilayah" class="form-input" required>
+      </div>
+     </div><!-- Contact Info Section -->
+     <div class="form-section">
+      <div class="form-section-title">
+       📞 Informasi Kontak
+      </div>
+      <div class="form-group"><label class="form-label">No HP *</label> <input type="tel" id="noHp" class="form-input" required>
+      </div>
+      <div class="form-group"><label class="form-label">Email *</label> <input type="email" id="email" class="form-input" required>
+      </div>
+     </div><!-- Status Section -->
+     <div class="form-section">
+      <div class="form-section-title">
+       📋 Status &amp; Tanggal
+      </div>
+      <div class="form-group"><label class="form-label">Status Keaktifan *</label> <select id="statusKeaktifan" class="form-input" required> <option value="">Pilih Status</option> <option value="Aktif">Aktif</option> <option value="Tidak Aktif">Tidak Aktif</option> </select>
+      </div>
+      <div class="form-group"><label class="form-label">Tanggal Bergabung *</label> <input type="date" id="tanggalBergabung" class="form-input" required>
+      </div>
+     </div><!-- Action Buttons -->
+     <div class="form-section">
+      <div class="grid grid-cols-2 gap-3"><button type="button" id="cancelBtn" class="btn-secondary"> Batal </button> <button type="submit" id="saveBtn" class="btn-primary"> <span class="save-text">Simpan</span>
+        <div class="save-loading hidden flex items-center justify-center">
+         <div class="loading-spinner mr-2"></div> Menyimpan...
+        </div></button>
+      </div>
+     </div>
+    </form>
+   </div>
+  </div><!-- Camera Modal -->
+  <div id="cameraModal" class="hidden camera-modal"><button id="closeCameraBtn" class="camera-close">✕</button>
+   <div class="camera-container">
+    <video id="cameraVideo" class="camera-video" autoplay playsinline></video>
+    <canvas id="cameraCanvas" class="hidden"></canvas>
+    <div class="camera-controls"><button id="switchCameraBtn" class="bg-gray-600 text-white p-3 rounded-full"> 🔄 </button> <button id="captureBtn" class="capture-btn"> 📷 </button> <button id="cancelCameraBtn" class="bg-red-600 text-white p-3 rounded-full"> ✕ </button>
+    </div>
+   </div>
+  </div><!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+   <div class="bg-white rounded-2xl w-full max-w-sm p-6">
+    <div class="text-center mb-6">
+     <div class="text-4xl mb-4">
+      ⚠️
+     </div>
+     <h3 class="text-lg font-semibold text-gray-800 mb-2">Konfirmasi Hapus</h3>
+     <p class="text-gray-600">Apakah Anda yakin ingin menghapus anggota ini? Tindakan ini tidak dapat dibatalkan.</p>
+    </div>
+    <div class="grid grid-cols-2 gap-3"><button id="cancelDeleteBtn" class="btn-secondary"> Batal </button> <button id="confirmDeleteBtn" class="bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg font-semibold transition duration-200"> <span class="delete-text">Hapus</span>
+      <div class="delete-loading hidden flex items-center justify-center">
+       <div class="loading-spinner mr-2"></div> Menghapus...
+      </div></button>
+    </div>
+   </div>
+  </div>
+  <script>
+        // Global variables
+        let currentMembers = [];
+        let currentPage = 'dashboard';
+        let editingMember = null;
+        let memberToDelete = null;
+        let statusChart = null;
+        let parokiChart = null;
+        let cameraStream = null;
+        let currentFacingMode = 'user';
+        let capturedPhoto = null;
+
+        // Default configuration
+        const defaultConfig = {
+            app_title: "Kaum Bapak Katolik KKT-MBD",
+            welcome_message: "Selamat datang di sistem manajemen data Kaum Bapak Katolik",
+            organization_name: "Kaum Bapak Katolik Kevikepan KKT-MBD"
+        };
+
+        // Data handler for SDK
+        const dataHandler = {
+            onDataChanged(data) {
+                currentMembers = data;
+                updateDashboardStats();
+                renderMembersList();
+                updateCharts();
+                updateRecentActivity();
+            }
+        };
+
+        // Initialize app
+        async function initApp() {
+            // Initialize Element SDK
+            if (window.elementSdk) {
+                await window.elementSdk.init({
+                    defaultConfig,
+                    onConfigChange: async (config) => {
+                        document.getElementById('appTitle').textContent = config.app_title || defaultConfig.app_title;
+                        document.getElementById('welcomeMessage').textContent = config.welcome_message || defaultConfig.welcome_message;
+                        document.getElementById('organizationName').textContent = config.organization_name || defaultConfig.organization_name;
+                    },
+                    mapToCapabilities: (config) => ({
+                        recolorables: [],
+                        borderables: [],
+                        fontEditable: undefined,
+                        fontSizeable: undefined
+                    }),
+                    mapToEditPanelValues: (config) => new Map([
+                        ["app_title", config.app_title || defaultConfig.app_title],
+                        ["welcome_message", config.welcome_message || defaultConfig.welcome_message],
+                        ["organization_name", config.organization_name || defaultConfig.organization_name]
+                    ])
+                });
+            }
+
+            // Initialize Data SDK
+            if (window.dataSdk) {
+                const result = await window.dataSdk.init(dataHandler);
+                if (!result.isOk) {
+                    console.error("Failed to initialize data SDK");
+                }
+            }
+
+            setupEventListeners();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Login form
+            document.getElementById('loginForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                showMainApp();
+            });
+
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                showLoginScreen();
+            });
+
+            // Navigation
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const page = btn.dataset.page;
+                    navigateToPage(page);
+                });
+            });
+
+            // Quick actions
+            document.querySelectorAll('.quick-action-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const action = btn.dataset.action;
+                    if (action === 'add-member') {
+                        showAddMemberModal();
+                    } else if (action === 'view-stats') {
+                        navigateToPage('statistics');
+                    }
+                });
+            });
+
+            // Add member button
+            document.getElementById('addMemberBtn').addEventListener('click', showAddMemberModal);
+
+            // Search
+            document.getElementById('searchInput').addEventListener('input', filterMembers);
+
+            // Modal events
+            document.getElementById('memberForm').addEventListener('submit', handleSaveMember);
+            document.getElementById('cancelBtn').addEventListener('click', hideMemberModal);
+            document.getElementById('closeModalBtn').addEventListener('click', hideMemberModal);
+            document.getElementById('cancelDeleteBtn').addEventListener('click', hideDeleteModal);
+            document.getElementById('confirmDeleteBtn').addEventListener('click', handleDeleteMember);
+
+            // Camera events
+            document.getElementById('capturePhotoBtn').addEventListener('click', openCamera);
+            document.getElementById('removePhotoBtn').addEventListener('click', removePhoto);
+            document.getElementById('closeCameraBtn').addEventListener('click', closeCamera);
+            document.getElementById('cancelCameraBtn').addEventListener('click', closeCamera);
+            document.getElementById('captureBtn').addEventListener('click', capturePhoto);
+            document.getElementById('switchCameraBtn').addEventListener('click', switchCamera);
+
+            // Close modals on backdrop click
+            document.getElementById('memberModal').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) hideMemberModal();
+            });
+            document.getElementById('deleteModal').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) hideDeleteModal();
+            });
+        }
+
+        // Navigation functions
+        function showLoginScreen() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+        }
+
+        function showMainApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            navigateToPage('dashboard');
+        }
+
+        function navigateToPage(page) {
+            // Update navigation
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('nav-active');
+            });
+            document.querySelector(`[data-page="${page}"]`).classList.add('nav-active');
+
+            // Show page
+            document.querySelectorAll('.page-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`${page}Page`).classList.remove('hidden');
+            document.getElementById(`${page}Page`).classList.add('fade-in');
+
+            currentPage = page;
+
+            // Initialize charts if statistics page
+            if (page === 'statistics') {
+                setTimeout(updateCharts, 100);
+            }
+        }
+
+        // Dashboard functions
+        function updateDashboardStats() {
+            const total = currentMembers.length;
+            const active = currentMembers.filter(m => m.status_keaktifan === 'Aktif').length;
+            
+            document.getElementById('totalMembers').textContent = total;
+            document.getElementById('activeMembers').textContent = active;
+        }
+
+        function updateRecentActivity() {
+            const container = document.getElementById('recentActivity');
+            if (currentMembers.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm">Belum ada data anggota</p>';
+                return;
+            }
+
+            // Show recent additions (last 3)
+            const recent = currentMembers
+                .sort((a, b) => new Date(b.tanggal_bergabung) - new Date(a.tanggal_bergabung))
+                .slice(0, 3);
+
+            container.innerHTML = recent.map(member => `
+                <div class="flex items-center text-sm bg-gray-50 p-3 rounded-lg">
+                    <span class="text-green-600 mr-3 text-lg">✅</span>
+                    <div>
+                        <div class="font-medium text-gray-800">${member.nama_lengkap}</div>
+                        <div class="text-gray-600">${member.jabatan_organisasi} - ${member.paroki}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Members functions
+        function renderMembersList() {
+            const container = document.getElementById('membersList');
+            const loading = document.getElementById('membersLoading');
+            
+            if (currentMembers.length === 0) {
+                loading.classList.add('hidden');
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="text-6xl mb-4">👥</div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">Belum Ada Data Anggota</h3>
+                        <p class="text-gray-500 mb-6">Mulai dengan menambahkan anggota pertama</p>
+                        <button onclick="showAddMemberModal()" class="btn-primary max-w-xs mx-auto">
+                            ➕ Tambah Anggota Pertama
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            loading.classList.add('hidden');
+            container.innerHTML = currentMembers.map(member => `
+                <div class="member-card">
+                    <div class="flex items-start space-x-4">
+                        ${member.photo ? `
+                            <img src="${member.photo}" alt="Photo ${member.nama_lengkap}" class="w-16 h-16 rounded-full object-cover border-2 border-gray-200 flex-shrink-0">
+                        ` : `
+                            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+                                ${member.nama_lengkap.charAt(0).toUpperCase()}
+                            </div>
+                        `}
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between mb-2">
+                                <div>
+                                    <h3 class="font-semibold text-gray-800 text-lg">${member.nama_lengkap}</h3>
+                                    <p class="text-blue-600 font-medium text-sm">${member.jabatan_organisasi}</p>
+                                </div>
+                                <span class="status-badge ${member.status_keaktifan === 'Aktif' ? 'status-active' : 'status-inactive'}">
+                                    ${member.status_keaktifan}
+                                </span>
+                            </div>
+                            <div class="text-sm text-gray-600 space-y-1">
+                                <p>💼 ${member.pekerjaan}</p>
+                                <p>⛪ ${member.paroki} - ${member.lingkungan}</p>
+                                <p>🌍 ${member.wilayah}</p>
+                                <p>📞 ${member.no_hp}</p>
+                            </div>
+                            <div class="flex space-x-2 mt-3">
+                                <button onclick="editMember('${member.__backendId}')" class="bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 py-1 rounded-lg text-sm font-medium transition duration-200">
+                                    ✏️ Edit
+                                </button>
+                                <button onclick="showDeleteModal('${member.__backendId}')" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1 rounded-lg text-sm font-medium transition duration-200">
+                                    🗑️ Hapus
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterMembers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            let filtered = currentMembers;
+
+            if (searchTerm) {
+                filtered = filtered.filter(member => 
+                    member.nama_lengkap.toLowerCase().includes(searchTerm) ||
+                    member.jabatan_organisasi.toLowerCase().includes(searchTerm) ||
+                    member.paroki.toLowerCase().includes(searchTerm) ||
+                    member.wilayah.toLowerCase().includes(searchTerm) ||
+                    member.pekerjaan.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Temporarily update display
+            const originalMembers = currentMembers;
+            currentMembers = filtered;
+            renderMembersList();
+            currentMembers = originalMembers;
+        }
+
+        // Modal functions
+        function generateMemberId() {
+            const year = new Date().getFullYear();
+            const existingIds = currentMembers.map(m => m.id_anggota);
+            let counter = 1;
+            let newId;
+            
+            do {
+                newId = `KKT-${year}-${counter.toString().padStart(3, '0')}`;
+                counter++;
+            } while (existingIds.includes(newId));
+            
+            return newId;
+        }
+
+        function showAddMemberModal() {
+            editingMember = null;
+            capturedPhoto = null;
+            document.getElementById('modalTitle').textContent = 'Tambah Anggota Baru';
+            document.getElementById('memberForm').reset();
+            document.getElementById('idAnggota').value = generateMemberId();
+            resetPhotoPreview();
+            document.getElementById('memberModal').classList.remove('hidden');
+        }
+
+        function editMember(backendId) {
+            editingMember = currentMembers.find(m => m.__backendId === backendId);
+            if (!editingMember) return;
+
+            document.getElementById('modalTitle').textContent = 'Edit Anggota';
+            document.getElementById('idAnggota').value = editingMember.id_anggota;
+            document.getElementById('namaLengkap').value = editingMember.nama_lengkap;
+            document.getElementById('jabatanOrganisasi').value = editingMember.jabatan_organisasi || '';
+            document.getElementById('pekerjaan').value = editingMember.pekerjaan || '';
+            document.getElementById('paroki').value = editingMember.paroki;
+            document.getElementById('lingkungan').value = editingMember.lingkungan;
+            document.getElementById('wilayah').value = editingMember.wilayah;
+            document.getElementById('noHp').value = editingMember.no_hp;
+            document.getElementById('email').value = editingMember.email;
+            document.getElementById('statusKeaktifan').value = editingMember.status_keaktifan;
+            document.getElementById('tanggalBergabung').value = editingMember.tanggal_bergabung;
+            
+            // Set photo
+            capturedPhoto = editingMember.photo || null;
+            updatePhotoPreview();
+            
+            document.getElementById('memberModal').classList.remove('hidden');
+        }
+
+        function hideMemberModal() {
+            document.getElementById('memberModal').classList.add('hidden');
+            editingMember = null;
+            capturedPhoto = null;
+        }
+
+        function showDeleteModal(backendId) {
+            memberToDelete = currentMembers.find(m => m.__backendId === backendId);
+            if (memberToDelete) {
+                document.getElementById('deleteModal').classList.remove('hidden');
+            }
+        }
+
+        function hideDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            memberToDelete = null;
+        }
+
+        // Camera functions
+        async function openCamera() {
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: currentFacingMode }
+                });
+                
+                const video = document.getElementById('cameraVideo');
+                video.srcObject = cameraStream;
+                
+                document.getElementById('cameraModal').classList.remove('hidden');
+            } catch (error) {
+                showToast('Tidak dapat mengakses kamera. Pastikan izin kamera telah diberikan.', 'error');
+            }
+        }
+
+        function closeCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+            document.getElementById('cameraModal').classList.add('hidden');
+        }
+
+        async function switchCamera() {
+            currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+            closeCamera();
+            await openCamera();
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.getElementById('cameraCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            ctx.drawImage(video, 0, 0);
+            
+            capturedPhoto = canvas.toDataURL('image/jpeg', 0.8);
+            updatePhotoPreview();
+            closeCamera();
+        }
+
+        function removePhoto() {
+            capturedPhoto = null;
+            resetPhotoPreview();
+        }
+
+        function resetPhotoPreview() {
+            const preview = document.getElementById('photoPreview');
+            preview.className = 'photo-placeholder mx-auto mb-4';
+            preview.innerHTML = '📷';
+            document.getElementById('removePhotoBtn').classList.add('hidden');
+        }
+
+        function updatePhotoPreview() {
+            const preview = document.getElementById('photoPreview');
+            const removeBtn = document.getElementById('removePhotoBtn');
+            
+            if (capturedPhoto) {
+                preview.className = 'photo-preview mx-auto mb-4';
+                preview.innerHTML = `<img src="${capturedPhoto}" alt="Preview" class="w-full h-full object-cover rounded-full">`;
+                removeBtn.classList.remove('hidden');
+            } else {
+                resetPhotoPreview();
+            }
+        }
+
+        // CRUD operations
+        async function handleSaveMember(e) {
+            e.preventDefault();
+            
+            if (currentMembers.length >= 999 && !editingMember) {
+                showToast('Maksimum 999 anggota telah tercapai. Hapus beberapa anggota terlebih dahulu.', 'error');
+                return;
+            }
+
+            const saveBtn = document.getElementById('saveBtn');
+            const saveText = saveBtn.querySelector('.save-text');
+            const saveLoading = saveBtn.querySelector('.save-loading');
+            
+            saveText.classList.add('hidden');
+            saveLoading.classList.remove('hidden');
+            saveBtn.disabled = true;
+
+            const memberData = {
+                id_anggota: document.getElementById('idAnggota').value,
+                nama_lengkap: document.getElementById('namaLengkap').value,
+                jabatan_organisasi: document.getElementById('jabatanOrganisasi').value,
+                pekerjaan: document.getElementById('pekerjaan').value,
+                photo: capturedPhoto || '',
+                paroki: document.getElementById('paroki').value,
+                lingkungan: document.getElementById('lingkungan').value,
+                wilayah: document.getElementById('wilayah').value,
+                no_hp: document.getElementById('noHp').value,
+                email: document.getElementById('email').value,
+                status_keaktifan: document.getElementById('statusKeaktifan').value,
+                tanggal_bergabung: document.getElementById('tanggalBergabung').value
+            };
+
+            try {
+                let result;
+                if (editingMember) {
+                    result = await window.dataSdk.update({
+                        ...memberData,
+                        __backendId: editingMember.__backendId
+                    });
+                } else {
+                    result = await window.dataSdk.create(memberData);
+                }
+
+                if (result.isOk) {
+                    hideMemberModal();
+                    showToast(editingMember ? 'Anggota berhasil diperbarui' : 'Anggota berhasil ditambahkan', 'success');
+                } else {
+                    showToast('Gagal menyimpan data anggota', 'error');
+                }
+            } catch (error) {
+                showToast('Terjadi kesalahan saat menyimpan data', 'error');
+            } finally {
+                saveText.classList.remove('hidden');
+                saveLoading.classList.add('hidden');
+                saveBtn.disabled = false;
+            }
+        }
+
+        async function handleDeleteMember() {
+            if (!memberToDelete) return;
+
+            const deleteBtn = document.getElementById('confirmDeleteBtn');
+            const deleteText = deleteBtn.querySelector('.delete-text');
+            const deleteLoading = deleteBtn.querySelector('.delete-loading');
+            
+            deleteText.classList.add('hidden');
+            deleteLoading.classList.remove('hidden');
+            deleteBtn.disabled = true;
+
+            try {
+                const result = await window.dataSdk.delete(memberToDelete);
+                
+                if (result.isOk) {
+                    hideDeleteModal();
+                    showToast('Anggota berhasil dihapus', 'success');
+                } else {
+                    showToast('Gagal menghapus anggota', 'error');
+                }
+            } catch (error) {
+                showToast('Terjadi kesalahan saat menghapus data', 'error');
+            } finally {
+                deleteText.classList.remove('hidden');
+                deleteLoading.classList.add('hidden');
+                deleteBtn.disabled = false;
+            }
+        }
+
+        // Charts functions
+        function updateCharts() {
+            updateStatusChart();
+            updateParokiChart();
+        }
+
+        function updateStatusChart() {
+            const ctx = document.getElementById('statusChart').getContext('2d');
+            
+            if (statusChart) {
+                statusChart.destroy();
+            }
+
+            const statusData = currentMembers.reduce((acc, member) => {
+                acc[member.status_keaktifan] = (acc[member.status_keaktifan] || 0) + 1;
+                return acc;
+            }, {});
+
+            statusChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(statusData),
+                    datasets: [{
+                        data: Object.values(statusData),
+                        backgroundColor: ['#10b981', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateParokiChart() {
+            const ctx = document.getElementById('parokiChart').getContext('2d');
+            
+            if (parokiChart) {
+                parokiChart.destroy();
+            }
+
+            const parokiData = currentMembers.reduce((acc, member) => {
+                acc[member.paroki] = (acc[member.paroki] || 0) + 1;
+                return acc;
+            }, {});
+
+            parokiChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(parokiData),
+                    datasets: [{
+                        label: 'Jumlah Anggota',
+                        data: Object.values(parokiData),
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Utility functions
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `fixed top-20 left-4 right-4 z-50 px-4 py-3 rounded-lg text-white text-sm font-medium ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+            }`;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'999b141c73bd582b',t:'MTc2MjMzMjM2NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
